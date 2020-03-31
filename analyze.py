@@ -63,16 +63,18 @@ def get_trending_tweets():
         #get search results for trend
         results = Twitter.search(trend,tweet_mode='extended')
         for result in results:
+
             tweet = result.full_text
             tweet = re.sub(r'([^\s\w]|_)+', '', tweet)    #get just alphanum/spaces from tweets
-            if tweet != '':
-                if(detect(tweet) == 'en'): #if tweet is in english
-                    search_results.append(tweet)
+
+            if tweet != '' and detect(tweet) == 'en':
+                search_results.append(tweet)
                 
 
     for text in search_results:
         print(text)
-    print('helloooooooo')
+        print()
+
         
        
 
