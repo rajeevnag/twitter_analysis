@@ -69,24 +69,56 @@ def get_trending_tweets():
 
             if tweet != '' and detect(tweet) == 'en':
                 search_results.append(tweet)
-                
 
-    for text in search_results:
-        print(text)
-        print()
+    return search_results           
 
-        
-       
+def get_real_username(user_name):
+    search_result = list()
+    search_result = Twitter.search_users(user_name)
+    while Twitter.search_users(user_name) == list():
+        print('Invalid user, pick again')
+        user_name = input()
 
-        
-        
+    #grab first search result if user used name (they shouldn't have)
+    user_name = search_result[0].screen_name
+    return user_name
 
+def assert_user_has_info(user_name,user_info):
+    
+    while user_info == list():
+        print("User has no tweets, pick another")
+        user_name = input()
 
+        #verify username is in use
+        user_name = get_real_username(user_name)
 
+        user_info = Twitter.user_timeline(user_name, count = 100, include_rts=True, tweet_mode='extended')
 
+    return user_info
 
 def get_user_tweets():
-    print('hi')
+    print("Please enter the username of the user you would like to analyze")
+    user_name = input()
+
+    breakpoint()
+    #verify user exists
+    user_name = get_real_username(user_name)
+    
+    #get user info
+    user_info = Twitter.user_timeline(user_name, count = 100, include_rts=True, tweet_mode='extended')
+    
+    #assert user has information
+    user_info = assert_user_has_info(user_name,user_info)
+    
+    #list of tweets from user    
+    user_tweets = [tweet.full_text for tweet in user_info if detect(tweet.full_text) == 'en']
+
+    #get rid of RT substring in tweets
+    user_tweets = [tweet.replace('RT','') for tweet in user_tweets]
+
+    return user_tweets
+
+
 def get_keyword_tweets():
     print('hi')
 
@@ -105,10 +137,6 @@ auth.set_access_token(access_token, access_token_secret)
 
 Twitter = tweepy.API(auth)
 
-# public_tweets = api.home_timeline()
-# print(type(public_tweets))
-# for tweet in public_tweets:
-#     print(tweet.text)
 
 print('Welcome to the Twitter sentiment analyzer')
 print('You can analyze the sentiment of trending tweets, user tweets, or tweets falling under a specific keyword')
@@ -131,8 +159,14 @@ while True:
     tweets = list()
     if choice == 1:
         tweets = get_trending_tweets()
+        while tweets == list():
+            print('Sorry, no tweets from that area.')
+            tweets = get_trending_tweets
     elif choice == 2:
         tweets = get_user_tweets()
+        while tweets == list():
+            print('Sorry, no tweets in English from that person.')
+            tweets = get_user_tweets()
     elif choice == 3:
         tweets = get_keyword_tweets()
     elif choice == 4:
