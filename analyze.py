@@ -100,7 +100,7 @@ def get_user_tweets():
     print("Please enter the username of the user you would like to analyze")
     user_name = input()
 
-    breakpoint()
+    
     #verify user exists
     user_name = get_real_username(user_name)
     
@@ -121,6 +121,18 @@ def get_user_tweets():
 
 def get_keyword_tweets():
     print('hi')
+    x = 'hello'
+    return x
+
+
+def write_tweets(tweets):
+    file = open('tweets.txt','w')
+    for tweet in tweets:
+        file.write(tweet)
+        file.write('\n')
+
+    file.close()
+
 
 import re
 import tweepy
@@ -171,3 +183,5 @@ while True:
         tweets = get_keyword_tweets()
     elif choice == 4:
         break
+
+    write_tweets(tweets)
