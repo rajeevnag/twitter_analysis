@@ -66,6 +66,7 @@ def get_trending_tweets():
 
             tweet = result.full_text
             tweet = re.sub(r'([^\s\w]|_)+', '', tweet)    #get just alphanum/spaces from tweets
+            tweet.replace('RT','') #get rid of RT part of retweeted tweets
 
             if tweet != '' and detect(tweet) == 'en':
                 search_results.append(tweet)
@@ -110,19 +111,38 @@ def get_user_tweets():
     #assert user has information
     user_info = assert_user_has_info(user_name,user_info)
     
+    user_tweets = list()
     #list of tweets from user    
-    user_tweets = [tweet.full_text for tweet in user_info if detect(tweet.full_text) == 'en']
-
-    #get rid of RT substring in tweets
-    user_tweets = [tweet.replace('RT','') for tweet in user_tweets]
+    for entry in user_info:
+        tweet = entry.full_text
+        tweet = tweet.replace('RT','') #replace "RT" part of retweets with blank
+        tweet = re.sub(r'([^\s\w]|_)+', '', tweet) #just take alphanum chars 
+        if detect(tweet) == 'en':   #if tweet is in english
+            user_tweets.append(tweet)
 
     return user_tweets
 
 
 def get_keyword_tweets():
-    print('hi')
-    x = 'hello'
-    return x
+
+    print("What keyword would you like to search?")
+    query = input()
+
+    search_info = Twitter.search(query,count = 100,tweet_mode='extended') #get first 100 tweets from keyword
+    
+    breakpoint()
+    tweets = list()
+    
+    for entry in search_info:
+        tweet = entry.full_text
+        tweet = tweet.replace('RT','')
+        tweet = re.sub(r'([^\s\w]|_)+', '', tweet)    #get just alphanum/spaces from tweets
+        if detect(tweet) == 'en':
+            tweets.append(tweet)
+    
+    breakpoint()
+    print(tweets)
+    return tweets
 
 
 def write_tweets(tweets):

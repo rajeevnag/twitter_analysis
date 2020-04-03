@@ -37,7 +37,9 @@ data['content'] = data['content'].apply(
 # Removing Punctuation, Symbols
 data['content'] = data['content'].str.replace('[^\w\s]', ' ')
 
+
 # Removing Stop Words using NLTK
+
 stop = stopwords.words('english')
 data['content'] = data['content'].apply(
     lambda x: " ".join(x for x in x.split() if x not in stop))
@@ -152,9 +154,9 @@ tweets = pd.DataFrame(['I am very happy today! The atmosphere looks cheerful',
                        'His death broke my heart. It was a sad day'])
 
 with open('tweets.txt','r') as f:
-    tweets = f.readlines()
+    tweet_text = f.readlines()
+tweets = pd.DataFrame([tweet_text])
 
-breakpoint()
 
 
 
