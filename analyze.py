@@ -130,9 +130,8 @@ def get_keyword_tweets():
 
     search_info = Twitter.search(query,count = 100,tweet_mode='extended') #get first 100 tweets from keyword
     
-    breakpoint()
     tweets = list()
-    
+
     for entry in search_info:
         tweet = entry.full_text
         tweet = tweet.replace('RT','')
@@ -140,8 +139,7 @@ def get_keyword_tweets():
         if detect(tweet) == 'en':
             tweets.append(tweet)
     
-    breakpoint()
-    print(tweets)
+   
     return tweets
 
 
@@ -204,4 +202,5 @@ while True:
     elif choice == 4:
         break
 
+    print('Program completed')
     write_tweets(tweets)
