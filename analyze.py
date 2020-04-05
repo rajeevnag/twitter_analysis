@@ -14,7 +14,8 @@ def get_trending_tweets():
     elif location == 2:
         location = str(input("Would you like to see some locations? (enter yes or no) "))
         while location != 'yes' and location != 'no':
-            location = str(input('Error: please enter valid input'))
+            print('Error: please enter valid input')
+            location = str(input())
 
         if location == 'yes':
 
@@ -65,12 +66,12 @@ def get_trending_tweets():
             tweet = result.full_text
             if detect(tweet) == 'en':
 
-                
                 tweet = re.sub(r'([^\s\w]|_)+', '', tweet)    #get just alphanum/spaces from tweets
                 if tweet.find('RT',0,4) == 0:
                     
                     tweet = tweet[3:] #remove everything up until first instance of RT in text(always first 2 chars)
-
+                if tweet.find('https') != -1: #remove image tags
+                    tweet = tweet[:tweet.find('https')]
                 search_results.append(tweet)
 
     return search_results           
@@ -124,6 +125,9 @@ def get_user_tweets():
                     
                 tweet = tweet[3:] #remove everything up until first instance of RT in text(always first 2 chars)
 
+            if tweet.find('https') != -1: #remove image tags
+                tweet = tweet[:tweet.find('https')]
+
             user_tweets.append(tweet)
 
     return user_tweets
@@ -135,28 +139,35 @@ def get_keyword_tweets():
     print("What keyword would you like to search?")
     query = input()
 
-    search_info = Twitter.search(query,count = 100,tweet_mode='extended') #get first 100 tweets from keyword
+    search_info = Twitter.search(query,count = 1000,tweet_mode='extended') #get up to first 500 tweets from keyword
     
     tweets = list()
 
     for entry in search_info:
         tweet = entry.full_text
-        if detect(tweet) == 'en':
+        
+        if detect(tweet) == 'en' and query in tweet: #only look at tweets containing search query
+ 
             tweet = re.sub(r'([^\s\w]|_)+', '', tweet)    #get just alphanum/spaces from tweets
 
             if tweet.find('RT',0,4) == 0:
                 tweet = tweet[3:] #remove everything up until first instance of RT in text(always first 2 chars)
+            if tweet.find('https') != -1: #remove image tags
+                tweet = tweet[:tweet.find('https')]
 
             tweets.append(tweet)
-    
+    breakpoint()
     return tweets
 
 
 
 def analyze_setiments(tweets):
+
     from textblob import TextBlob
     print('Would you like your results written to a file? (yes/no)')
     answer = input()
+    polarity_counter = 0
+
     while answer != 'yes' and answer != 'no':
         print('Please retype your answer')
         answer = input()
@@ -170,6 +181,8 @@ def analyze_setiments(tweets):
                 file.write(tweet)
                 file.write('\n')
                 file.write('Sentiment: ')
+
+                polarity_counter += blob.sentiment.polarity
                 if blob.sentiment.polarity > 0:
                     file.write('Positive')
                 elif blob.sentiment.polarity == 0:
@@ -177,18 +190,42 @@ def analyze_setiments(tweets):
                 else:
                     file.write('Negative')
                 file.write('\n')
+                file.write('\n')
+
+            file.write('Average sentiment: ')
+            avg_sentiment = float(polarity_counter) / float(len(tweets))
+            if avg_sentiment > 0:
+                file.write('Positive')
+            elif avg_sentiment == 0:
+                file.write('Neutral')
+            else:
+                file.write('Negative')
+        
 
     else:
         for tweet in tweets:
             blob = TextBlob(tweet)
             print(tweet)
                 
+            polarity_counter += blob.sentiment.polarity
+
             if blob.sentiment.polarity > 0:
                 print('Sentiment: Positive')
             elif blob.sentiment.polarity == 0:
                 print('Sentiment: Neutral')
             else:
                 print('Sentiment: Negative')
+
+        avg_sentiment = float(polarity_counter) / float(len(tweets))
+        print()
+        if avg_sentiment > 0:
+            print('Average sentiment: Positive')
+        elif avg_sentiment == 0:
+            print('Average sentiment: Neutral')
+        else:
+            print('Average sentiment: Negative')
+
+        
 
     
 
