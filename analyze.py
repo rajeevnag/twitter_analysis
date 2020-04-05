@@ -1,13 +1,13 @@
 
 def get_trending_tweets():
-    trends = Twitter.trends_available()
+    
     print()
     print("Where would you like to get trending tweets from?")
     print("1) Worldwide")
     print("2) Other")
 
     location = int(input())
-    woeid = -1 #id used for identifying location through tweepy
+    woeid = int() #id used for identifying location through tweepy
 
     if location == 1:
         woeid = 1
@@ -26,7 +26,6 @@ def get_trending_tweets():
                 loc = item['name']
                 names_of_locations.append(loc)
                 
-            
             #print trending locations
             for spot in names_of_locations:
                 print(spot)
@@ -63,12 +62,15 @@ def get_trending_tweets():
         #get search results for trend
         results = Twitter.search(trend,tweet_mode='extended')
         for result in results:
-
             tweet = result.full_text
-            tweet = re.sub(r'([^\s\w]|_)+', '', tweet)    #get just alphanum/spaces from tweets
-            tweet.replace('RT','') #get rid of RT part of retweeted tweets
+            if detect(tweet) == 'en':
 
-            if tweet != '' and detect(tweet) == 'en':
+                
+                tweet = re.sub(r'([^\s\w]|_)+', '', tweet)    #get just alphanum/spaces from tweets
+                if tweet.find('RT',0,4) == 0:
+                    
+                    tweet = tweet[3:] #remove everything up until first instance of RT in text(always first 2 chars)
+
                 search_results.append(tweet)
 
     return search_results           
@@ -113,14 +115,19 @@ def get_user_tweets():
     
     user_tweets = list()
     #list of tweets from user    
+
     for entry in user_info:
         tweet = entry.full_text
-        tweet = tweet.replace('RT','') #replace "RT" part of retweets with blank
-        tweet = re.sub(r'([^\s\w]|_)+', '', tweet) #just take alphanum chars 
-        if detect(tweet) == 'en':   #if tweet is in english
+        if detect(tweet) == 'en':
+            tweet = re.sub(r'([^\s\w]|_)+', '', tweet)    #get just alphanum/spaces from tweets
+            if tweet.find('RT',0,4) == 0:
+                    
+                tweet = tweet[3:] #remove everything up until first instance of RT in text(always first 2 chars)
+
             user_tweets.append(tweet)
 
     return user_tweets
+
 
 
 def get_keyword_tweets():
@@ -134,22 +141,63 @@ def get_keyword_tweets():
 
     for entry in search_info:
         tweet = entry.full_text
-        tweet = tweet.replace('RT','')
-        tweet = re.sub(r'([^\s\w]|_)+', '', tweet)    #get just alphanum/spaces from tweets
         if detect(tweet) == 'en':
+            tweet = re.sub(r'([^\s\w]|_)+', '', tweet)    #get just alphanum/spaces from tweets
+
+            if tweet.find('RT',0,4) == 0:
+                tweet = tweet[3:] #remove everything up until first instance of RT in text(always first 2 chars)
+
             tweets.append(tweet)
     
-   
     return tweets
 
 
-def write_tweets(tweets):
-    file = open('tweets.txt','w')
-    for tweet in tweets:
-        file.write(tweet)
-        file.write('\n')
 
-    file.close()
+def analyze_setiments(tweets):
+    from textblob import TextBlob
+    print('Would you like your results written to a file? (yes/no)')
+    answer = input()
+    while answer != 'yes' and answer != 'no':
+        print('Please retype your answer')
+        answer = input()
+    if answer == 'yes':
+        print('Please enter filename')
+        file_name = input()
+        with open(file_name +'.txt','w') as file:
+            for tweet in tweets:
+                blob = TextBlob(tweet)
+                
+                file.write(tweet)
+                file.write('\n')
+                file.write('Sentiment: ')
+                if blob.sentiment.polarity > 0:
+                    file.write('Positive')
+                elif blob.sentiment.polarity == 0:
+                    file.write('Neutral')
+                else:
+                    file.write('Negative')
+                file.write('\n')
+
+    else:
+        for tweet in tweets:
+            blob = TextBlob(tweet)
+            print(tweet)
+                
+            if blob.sentiment.polarity > 0:
+                print('Sentiment: Positive')
+            elif blob.sentiment.polarity == 0:
+                print('Sentiment: Neutral')
+            else:
+                print('Sentiment: Negative')
+
+    
+
+    
+    
+
+
+        
+    
 
 
 import re
@@ -202,5 +250,5 @@ while True:
     elif choice == 4:
         break
 
-    print('Program completed')
-    write_tweets(tweets)
+    analyze_setiments(tweets)
+    
