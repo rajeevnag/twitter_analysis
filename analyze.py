@@ -61,7 +61,7 @@ def get_trending_tweets():
 
     for trend in names_of_trends:
         #get search results for trend
-        results = Twitter.search(trend,tweet_mode='extended')
+        results = Twitter.search(trend,tweet_mode='extended',count = 1000)
         for result in results:
             tweet = result.full_text
             if detect(tweet) == 'en':
@@ -79,12 +79,28 @@ def get_trending_tweets():
 def get_real_username(user_name):
     search_result = list()
     search_result = Twitter.search_users(user_name)
+    
     while Twitter.search_users(user_name) == list():
         print('Invalid user, pick again')
         user_name = input()
+    
+    idx = 1
+    for person in search_result:
+        
+        print(str(idx) +': ' + person.screen_name)
+        idx += 1
+    breakpoint()
+    if idx > 2:# if more than 1 search result
+        print('Which person do you want?')
+        choice = int(input())
+    else:
+        choice = 1
+    while choice-1 < 0 and choice-1 > len(search_result):
+        print('Invalid choice number, pick again')
+        choice = input()
 
-    #grab first search result if user used name (they shouldn't have)
-    user_name = search_result[0].screen_name
+    breakpoint()
+    user_name = search_result[choice-1].screen_name
     return user_name
 
 def assert_user_has_info(user_name,user_info):
@@ -96,7 +112,7 @@ def assert_user_has_info(user_name,user_info):
         #verify username is in use
         user_name = get_real_username(user_name)
 
-        user_info = Twitter.user_timeline(user_name, count = 100, include_rts=True, tweet_mode='extended')
+        user_info = Twitter.user_timeline(user_name, count = 1000, include_rts=True, tweet_mode='extended')
 
     return user_info
 
@@ -109,8 +125,8 @@ def get_user_tweets():
     user_name = get_real_username(user_name)
     
     #get user info
-    user_info = Twitter.user_timeline(user_name, count = 100, include_rts=True, tweet_mode='extended')
-    
+    user_info = Twitter.user_timeline(user_name, count = 1000, include_rts=True, tweet_mode='extended')
+    breakpoint()
     #assert user has information
     user_info = assert_user_has_info(user_name,user_info)
     
