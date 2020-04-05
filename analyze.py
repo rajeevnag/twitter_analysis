@@ -257,12 +257,12 @@ import re
 import tweepy
 from langdetect import detect
 
-consumer_key = 'wailB3ljNEhmyzTu4eOIB69Qn'
-consumer_secret = 'rkBX3Il6LxbAneofVPU1vIO9QjLwNgSlNrWJI371qPSqcdrQcV'
+consumer_key = '' #removed for privacy
+consumer_secret = '' #removed for privacy
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 
-access_token = '1244794411017535489-I6uPkLJNGhhKT5r2es3c7mkIXZDwzo'
-access_token_secret = '0y0msMt3RmSlwcc50AJ6CaauJDVB6GR2cGglDj9KrAT0I'
+access_token = '' #removed for privacy
+access_token_secret = '' #removed for privacy
 
 auth.set_access_token(access_token, access_token_secret)
 
